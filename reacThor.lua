@@ -2,7 +2,12 @@ local component = require('component')
 local event = require('event')
 local term = require('term')
 
+local sucker = require('suck')
+
 local reactorSide = 4
+local quadSide = 3
+local dualSide = 0
+local disposalSide = 2
 
 local quadLabel = {
   live = "Quad Fuel Rod (Uranium)",
@@ -36,12 +41,22 @@ while true do
         print(msgPrefix .. 'OK - ' .. stack.label)
       elseif stack.label == fuel.depleted then
         print(msgPrefix .. 'DEPLETED - ' .. stack.label)
+        print('Replacing...')
+        sucker.suckItem(reactorSide,disposalSide,slot,1)
+        local sourceSide
+        if stack.label == quadLabel.depleted then
+          sourceSide = quadSide
+        elseif stack.label == dualLabel.depleted then
+          sourceSide = dualSide
+        end
+        sucker.suckItem(sourceSide,reactorSide,1,slot)
+        print('Replacement successful')
       else
-        print(msgPrefix .. 'WRONG - ' .. stack.label)
+        print(msgPrefix .. 'WRONG - ' .. stack.label .. ' - Expected: ' .. fuel.live)
         -- Shutdown reactor - Give reacThor a few tries before shutting down. Implement a counter of invalid states.
       end
     else
-      print(msgPrefix .. 'EMPTY. Expected: ' .. fuel.live)
+      print(msgPrefix .. 'EMPTY - Expected: ' .. fuel.live)
       -- Shutdown
     end  
   end
