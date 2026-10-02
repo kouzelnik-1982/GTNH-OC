@@ -1,0 +1,3 @@
+lua
+component.gpu.setCursorBlink(false)
+os.exit()
