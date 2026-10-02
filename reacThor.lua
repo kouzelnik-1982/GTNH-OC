@@ -27,12 +27,15 @@ local slotMap = {
   [21] = dualLabel
 }
 
+local scanInterval = 1
 local failureThreshold = 5
 local failureCounter = 0
 
 while true do
 
   term.clear()
+
+  local failure = false
   print('Scanning...')
 
   for slot,fuel in pairs(slotMap) do
@@ -56,11 +59,11 @@ while true do
         print('Replacement successful')
       else
         print(msgPrefix .. 'WRONG - ' .. stack.label .. ' - Expected: ' .. fuel.live)
-        failureCounter = failureCounter + 1
+        failure = true
       end
     else
       print(msgPrefix .. 'EMPTY - Expected: ' .. fuel.live)
-      failureCounter = failureCounter + 1
+      failure = true
     end  
   end
 
@@ -71,7 +74,13 @@ while true do
     break
   end  
 
-  if event.pull(1) == 'interrupted' then
+  if failure then
+    failureCounter = failureCounter + 1
+  else
+    failureCounter = 0
+  end
+
+  if event.pull(scanInterval) == 'interrupted' then
     print('Shutting down reacThor.')
     break
   end
