@@ -27,6 +27,9 @@ local slotMap = {
   [21] = dualLabel
 }
 
+local failureThreshold = 5
+local failureCounter = 0
+
 while true do
 
   term.clear()
@@ -53,13 +56,20 @@ while true do
         print('Replacement successful')
       else
         print(msgPrefix .. 'WRONG - ' .. stack.label .. ' - Expected: ' .. fuel.live)
-        -- Shutdown reactor - Give reacThor a few tries before shutting down. Implement a counter of invalid states.
+        failureCounter = failureCounter + 1
       end
     else
       print(msgPrefix .. 'EMPTY - Expected: ' .. fuel.live)
-      -- Shutdown
+      failureCounter = failureCounter + 1
     end  
   end
+
+  if failureCounter >= 5 then
+    print('Failure threshold (' .. failureThreshold .. ') reached. Commencing reactor shutdown...')
+    -- shut down reactor
+    print('Reactor shutdown completed')
+    break
+  end  
 
   if event.pull(1) == 'interrupted' then
     print('Shutting down reacThor.')
