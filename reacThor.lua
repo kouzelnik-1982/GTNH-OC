@@ -3,8 +3,10 @@ local event = require('event')
 local term = require('term')
 
 local sucker = require('suck')
+local redstone = require('redstone')
 
 local reactorSide = 4
+local redstoneSide = 4
 local quadSide = 3
 local dualSide = 0
 local disposalSide = 2
@@ -19,12 +21,10 @@ local dualLabel = {
 }
 
 local slotMap = {
-  [12] = quadLabel,
-  [20] = quadLabel,
-  [28] = quadLabel,
-  [2] = dualLabel,
-  [10] = dualLabel,
-  [21] = dualLabel
+  [1] = quadLabel,
+  [10] = quadLabel,
+  [11] = quadLabel,
+  [19] = dualLabel
 }
 
 local scanInterval = 1
@@ -35,6 +35,7 @@ while true do
 
   term.clear()
 
+  redstone.emit(redstoneSide, true)
   local failure = false
   print('Scanning...')
 
@@ -69,7 +70,7 @@ while true do
 
   if failureCounter >= 5 then
     print('Failure threshold (' .. failureThreshold .. ') reached. Commencing reactor shutdown...')
-    -- shut down reactor
+    redstone.emit(redstoneSide, false)
     print('Reactor shutdown completed')
     break
   end  
@@ -82,6 +83,7 @@ while true do
 
   if event.pull(scanInterval) == 'interrupted' then
     print('Shutting down reacThor.')
+    redstone.emit(redstoneSide, false)
     break
   end
 
